@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.kwang2003.hrm.party.dao.SecurityPermissionDao" >
+    <resultMap id="SecurityPermissionResultMap" type="SecurityPermission" >
+        <id column="id" property="id" jdbcType="VARCHAR"  />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, description, created_at,updated_at
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="SecurityPermissionResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from security_permission
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="findPageable"  resultMap="SecurityPermissionResultMap">
+    	select
+        <include refid="Base_Column_List" />
+        from security_permission
+        where 1=1
+        <if test="criteria!=null">
+        	and id like CONCAT('%',#{criteria},'%')
+        </if>
+        limit #{pageable.offset},#{pageable.pageSize}
+    </select>
+    
+    <select id="findPageableCount"  resultType="java.lang.Long">
+    	select
+        count(*)
+        from security_permission
+        where 1=1
+        <if test="criteria!=null">
+        	and id like CONCAT('%',#{criteria},'%')
+        </if>
+    </select>
+    <select id="findGroupPermissionPageable"  resultMap="SecurityPermissionResultMap">
+		SELECT
+			p.id,p.description,p.created_at,p.updated_at
+		FROM
+			security_permission p
+			RIGHT JOIN security_group_permission sp ON p.id = sp.security_permission_id 
+		WHERE
+			sp.security_group_id = #{groupId}
+        limit #{pageable.offset},#{pageable.pageSize}
+    </select>
+    
+    <select id="findGroupPermissionPageableCount"  resultType="java.lang.Long">
+    	select
+        count(*)
+		FROM
+			security_permission p
+			RIGHT JOIN security_group_permission sp ON p.id = sp.security_permission_id 
+		WHERE
+			sp.security_group_id = #{groupId}
+    </select>
+    
+    <select id="findCandidateGroupPermissionPageable"  resultMap="SecurityPermissionResultMap">
+		select p.id,p.description,p.created_at,p.updated_at
+		FROM
+			security_permission p
+		where p.id not in (select sp.security_permission_id from security_group_permission sp where sp.security_group_id=#{groupId})
+        limit #{pageable.offset},#{pageable.pageSize}
+    </select>
+    
+    <select id="findCandidateGroupPermissionPageableCount"  resultType="java.lang.Long">
+    	select
+        count(*)
+		FROM
+			security_permission p
+		where p.id not in (select sp.security_permission_id from security_group_permission sp where sp.security_group_id=#{groupId})
+    </select>
+</mapper>

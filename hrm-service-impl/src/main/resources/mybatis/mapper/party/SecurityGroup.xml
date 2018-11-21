@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.kwang2003.hrm.party.dao.SecurityGroupDao" >
+    <resultMap id="SecurityGroupResultMap" type="SecurityGroup" >
+        <id column="id" property="id" jdbcType="VARCHAR"  />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, description, created_at,updated_at
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="SecurityGroupResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from security_group
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="findPageable"  resultMap="SecurityGroupResultMap">
+    	select
+        <include refid="Base_Column_List" />
+        from security_group
+        where 1=1
+        <if test="criteria!=null">
+        	and id like CONCAT('%',#{criteria},'%')
+        </if>
+        limit #{pageable.offset},#{pageable.pageSize}
+    </select>
+    
+    <select id="findPageableCount"  resultType="java.lang.Long">
+    	select
+        count(*)
+        from security_group
+        where 1=1
+        <if test="criteria!=null">
+        	and id like CONCAT('%',#{criteria},'%')
+        </if>
+    </select>
+</mapper>
